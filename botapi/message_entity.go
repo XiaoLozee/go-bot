@@ -2,6 +2,18 @@ package botapi
 
 import "github.com/XiaoLuozee/go-bot/handler"
 
+type MusicPlatform string
+
+const (
+	QQ     MusicPlatform = "qq"
+	WangYi MusicPlatform = "163"
+	KuGou  MusicPlatform = "kugou"
+	MiGu   MusicPlatform = "migu"
+	KuWo   MusicPlatform = "kuwo"
+	// Custom 自定义
+	Custom MusicPlatform = "custom"
+)
+
 // Message 消息结构
 type Message struct {
 	Action  string      `json:"action"`
@@ -53,9 +65,14 @@ type PrivateForwardMsgParams struct {
 	Messages []ForwardNode `json:"messages"`
 }
 
-// GroupPoke 发送群聊戳一戳结构 接口 /group_poke
-type GroupPoke struct {
-	GroupId int64 `json:"group_id"`
+// JsonData 发送Json结构
+type JsonData struct {
+	Data string `json:"data"`
+}
+
+// PokeData 发送群聊戳一戳结构
+type PokeData struct {
+	GroupId int64 `json:"group_id,omitempty""`
 	UserId  int64 `json:"user_id"`
 }
 
@@ -77,7 +94,27 @@ type FileData struct {
 	Summary string `json:"summary,omitempty"`
 }
 
+// AtData 用于序列化At内容
 type AtData struct {
 	QQ   any    `json:"qq"`
 	Name string `json:"name,omitempty"`
+}
+
+type MusicData struct {
+	Type  MusicPlatform `json:"type"`
+	Id    string        `json:"id,omitempty"`    // 音乐id，自定义音乐时不需要
+	Url   string        `json:"url,omitempty"`   // 跳转链接，点击后跳转目标 URL
+	Audio string        `json:"audio,omitempty"` // 音频链接，用于自定义音乐
+	Title string        `json:"title,omitempty"` // 标题链接，用于自定义音乐
+	Image string        `json:"image,omitempty"` // 图片链接，用于自定义音乐
+}
+
+type ForwardData struct {
+	GroupId   int64 `json:"group_id,omitempty"`
+	UserId    int64 `json:"user_id,omitempty"`
+	MessageID int64 `json:"message_id"` // 要转发的聊天记录的 message_id
+}
+
+type IdData struct {
+	Id int64 `json:"id"`
 }

@@ -114,6 +114,163 @@ func SendGroupAtWithTextMsg(groupId int64, userId any, text string) {
 	SendMessage(GroupMessage, groupId, messageArray)
 }
 
+// SendMusicCardMsg 发送音乐卡片
+func SendMusicCardMsg(msgType int, id int64, musicPlatform MusicPlatform, musicId string) {
+	dataPayload := MusicData{
+		Type: musicPlatform,
+		Id:   musicId,
+	}
+	segment, err := buildSegment("music", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// SendCustomMusicCardMsg 发送自定义音乐卡片
+func SendCustomMusicCardMsg(msgType int, id int64, url string, audio string, title string, image string) {
+	dataPayload := MusicData{
+		Type:  Custom,
+		Url:   url,
+		Audio: audio,
+		Title: title,
+		Image: image,
+	}
+	segment, err := buildSegment("music", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// ForwardGroupSingleMsg 转发消息到群
+func ForwardGroupSingleMsg(groupId int64, messageID int64) {
+	params := &ForwardData{
+		GroupId:   groupId,
+		MessageID: messageID,
+	}
+	action := &Action{
+		Action: "forward_group_single_msg",
+		Params: params,
+		Echo:   fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+}
+
+// ForwardFriendSingleMsg 转发消息到私聊
+func ForwardFriendSingleMsg(userId int64, messageID int64) {
+	params := &ForwardData{
+		UserId:    userId,
+		MessageID: messageID,
+	}
+	action := &Action{
+		Action: "forward_friend_single_msg",
+		Params: params,
+		Echo:   fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+}
+
+// SendReplyMsg 发送回复消息
+func SendReplyMsg(msgType int, id int64, replyId int64, text string) {
+	replyPayload := IdData{Id: replyId}
+	replySegment, err1 := buildSegment("reply", replyPayload)
+	if err1 != nil {
+		log.Printf("API 调用失败: %v", err1)
+		return
+	}
+
+	textDataPayload := TextData{Text: " " + text}
+	textSegment, err2 := buildSegment("text", textDataPayload)
+	if err2 != nil {
+		log.Printf("API 调用失败: %v", err2)
+		return
+	}
+
+	messageArray := []handler.OB11Segment{*replySegment, *textSegment}
+
+	SendMessage(msgType, id, messageArray)
+}
+
+// SendGroupPoke 发送群聊戳一戳
+func SendGroupPoke(groupId int64, userId int64) {
+	params := &PokeData{
+		GroupId: groupId,
+		UserId:  userId,
+	}
+	action := &Action{
+		Action: "group_poke",
+		Params: params,
+		Echo:   fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+}
+
+// SendPrivatePoke 发送私聊戳一戳
+func SendPrivatePoke(userId int64) {
+	params := &PokeData{
+		UserId: userId,
+	}
+	action := &Action{
+		Action: "friend_poke",
+		Params: params,
+		Echo:   fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+}
+
+// SendJsonMsg 发送Json消息
+func SendJsonMsg(msgType int, id int64, jsonMsg string) {
+	dataPayload := JsonData{Data: jsonMsg}
+	segment, err := buildSegment("json", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// SendFaceMsg 发送QQ表情
+func SendFaceMsg(msgType int, id int64, faceId int64) {
+	dataPayload := IdData{Id: faceId}
+	segment, err := buildSegment("face", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// SendDiceMsg 发送骰子
+func SendDiceMsg(msgType int, id int64) {
+	segment := &handler.OB11Segment{
+		Type: "dice",
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// SendRpsMsg 发送猜拳
+func SendRpsMsg(msgType int, id int64) {
+	segment := &handler.OB11Segment{
+		Type: "rps",
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
 // SendGroupForwardMsg 发送群合并转发消息
 func SendGroupForwardMsg(groupId int64, nodes []ForwardNode, opts ...ForwardOption) {
 	params := &GroupForwardMsgParams{
