@@ -4,6 +4,7 @@ type Function interface {
 	Process(event interface{})
 }
 
+// 保存所有注册函数
 var functions []Function
 
 func Register(f Function) {

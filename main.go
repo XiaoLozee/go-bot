@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/XiaoLuozee/go-bot/botapi"
 	_ "github.com/XiaoLuozee/go-bot/function"
 	"github.com/XiaoLuozee/go-bot/handler"
 	"github.com/spf13/viper"
@@ -50,9 +51,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 4096,
 
 	// CheckOrigin 会检查请求的来源。
-	// 默认情况下，WebSocket 服务器只接受来自同源的请求。
-	// 为了方便开发，我们这里返回 true，允许所有来源的请求。
-	// 在生产环境中，你需要实现一个安全的检查逻辑！
+	// 返回 true，代表允许所有来源的请求
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -71,13 +70,11 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		_ = conn.Close()
 	}(conn)
 
+	client := botapi.NewClient(conn)
+	botapi.SetInstance(client)
 	log.Println("客户端已连接:", conn.RemoteAddr())
 
-	// 进入无限循环，处理来自客户端的消息
 	for {
-		// ReadMessage 从连接中读取一个消息
-		// messageType 是消息类型，可以是 TextMessage 或 BinaryMessage 等
-		// p 是消息的内容 (payload)
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
 			// 如果是连接关闭的错误，就打印日志并退出循环
@@ -93,13 +90,6 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			//log.Printf("收到消息 %s: %s", conn.RemoteAddr(), string(p))
 			handler.MessageHandler(p)
 		}
-
-		// 3. 将收到的消息原样写回客户端 (Echo)
-		//err = conn.WriteMessage(messageType, p)
-		//if err != nil {
-		//	log.Println("写入错误:", err)
-		//	break
-		//}
 	}
 
 	log.Println("客户端断开连接:", conn.RemoteAddr())
