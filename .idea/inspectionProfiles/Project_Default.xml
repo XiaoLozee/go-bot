@@ -4,6 +4,7 @@
     <inspection_tool class="GoDfaErrorMayBeNotNil" enabled="true" level="WARNING" enabled_by_default="true">
       <functions>
         <function importPath="github.com/XiaoLuozee/go-bot/botapi" name="createSegment" />
+        <function importPath="github.com/XiaoLuozee/go-bot/botapi" name="GetStrangerInfo" />
       </functions>
     </inspection_tool>
   </profile>

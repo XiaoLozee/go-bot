@@ -71,6 +71,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	// 函数退出时确保关闭连接
 	defer func(conn *websocket.Conn) {
 		_ = conn.Close()
+		botapi.SetInstance(nil)
 	}(conn)
 
 	client := botapi.NewClient(conn)
@@ -90,8 +91,9 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if messageType == websocket.TextMessage {
-			//log.Printf("收到消息 %s: %s", conn.RemoteAddr(), string(p))
-			handler.MessageHandler(p)
+			if !client.DispatchResponse(p) {
+				go handler.MessageHandler(p)
+			}
 		}
 	}
 

@@ -13,6 +13,50 @@ const (
 	PrivateMessage = 2
 )
 
+type StrangerInfo struct {
+	UserID    int64  `json:"user_id"`
+	Nickname  string `json:"nickname"`
+	Sex       string `json:"sex"`
+	Age       int32  `json:"age"` // 年龄通常不会非常大，int32 足够
+	Qid       string `json:"qid"`
+	Level     int    `json:"qq_level"` // 对应 qqLevel
+	LoginDays int    `json:"login_days"`
+}
+
+func GetStrangerInfo(userId int64) (*StrangerInfo, error) {
+	action := &Action{
+		Action: "get_stranger_info",
+		Params: map[string]interface{}{
+			"user_id": userId,
+		},
+		Echo: fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+	resp, err := sendSync(action)
+	if err != nil {
+		return nil, fmt.Errorf("API 调用失败 (get_stranger_info): %w", err)
+	}
+
+	if resp.RetCode != 0 {
+		return nil, fmt.Errorf("API 返回错误: %s (retcode: %d)", resp.Message, resp.RetCode)
+	}
+
+	var info StrangerInfo
+	if err := json.Unmarshal(resp.Data, &info); err != nil {
+		return nil, fmt.Errorf("解析 data 字段失败: %w", err)
+	}
+
+	return &info, nil
+}
+
+// sendSync 同步发送
+func sendSync(action *Action) (*APIResponse, error) {
+	client := GetInstance()
+	if client == nil {
+		return nil, fmt.Errorf("机器人客户端未连接")
+	}
+	return client.sendAndWait(action)
+}
+
 // SendTextMsg 发送文本消息
 func SendTextMsg(msgType int, id int64, msg string) {
 	dataPayload := TextData{
@@ -396,7 +440,6 @@ func buildSegment(segType string, dataPayload interface{}) (*handler.OB11Segment
 func sendUtil(action *Action) error {
 	client := GetInstance()
 	if client == nil {
-		// 返回一个明确的错误
 		return fmt.Errorf("机器人客户端未连接")
 	}
 

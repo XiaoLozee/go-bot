@@ -1,15 +1,17 @@
 package function
 
 import (
+	"fmt"
 	"github.com/XiaoLuozee/go-bot/botapi"
 	"github.com/XiaoLuozee/go-bot/handler"
 	"github.com/XiaoLuozee/go-bot/registry"
+	"log"
 )
 
 type TestPlugin struct{}
 
 func (p *TestPlugin) Process(event interface{}) {
-	msg, ok := event.(handler.Message)
+	msg, ok := event.(handler.OB11PrivateMessage)
 	if !ok {
 		return
 	}
@@ -39,6 +41,14 @@ func (p *TestPlugin) Process(event interface{}) {
 		//allNodes := []botapi.ForwardNode{simpleNode, simpleNode2}
 		//botapi.SendGroupForwardMsg(msg.GroupId, allNodes, botapi.WithSource("测试聊天记录"), botapi.WithForwardSummary("测试聊天记录2"), botapi.WithPrompt("[2条测试消息]"))
 		//botapi.SendReplyMsg(botapi.PrivateMessage, msg.UserID, msg.MessageId, "测试哈哈")
+		info, err := botapi.GetStrangerInfo(msg.UserID)
+		if err != nil {
+			log.Println("获取用户信息失败:", err)
+		} else {
+			fmt.Printf("获取到用户 %d 的昵称是: %s\n", info.UserID, info.Nickname)
+			botapi.SendTextMsg(botapi.PrivateMessage, msg.UserId, info.Nickname)
+		}
+
 	}
 }
 
