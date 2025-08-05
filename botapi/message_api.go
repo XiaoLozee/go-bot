@@ -40,6 +40,35 @@ func SendImgMsg(msgType int, id int64, imgPath string, opts ...ImageOption) {
 	SendMessage(msgType, id, []handler.OB11Segment{*segment})
 }
 
+// SendMultiImageWithTextMsg 发送图文消息
+func SendMultiImageWithTextMsg(msgType int, id int64, imgPaths []string, text string) {
+	var messageArray []handler.OB11Segment
+
+	for _, path := range imgPaths {
+		imgDataPayload := &FileData{File: path}
+		imgSegment, err := buildSegment("image", imgDataPayload)
+		if err != nil {
+			log.Printf("构建图片段失败 for path %s: %v", path, err)
+			continue
+		}
+		messageArray = append(messageArray, *imgSegment)
+	}
+
+	// 最后添加文本段
+	if text != "" {
+		textDataPayload := TextData{Text: text}
+		textSegment, err := buildSegment("text", textDataPayload)
+		if err == nil {
+			messageArray = append(messageArray, *textSegment)
+		}
+	}
+
+	// 发送组合消息
+	if len(messageArray) > 0 {
+		SendMessage(msgType, id, messageArray)
+	}
+}
+
 // SendVideoMsg 发送视频消息
 func SendVideoMsg(msgType int, id int64, videoPath string) {
 	dataPayload := FileData{File: videoPath}

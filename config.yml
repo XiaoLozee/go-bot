@@ -5,3 +5,4 @@ bot:
   nickname: "罗纸酱"
   function:
     test: false
+    video_parser: true

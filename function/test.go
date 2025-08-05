@@ -9,7 +9,7 @@ import (
 type TestPlugin struct{}
 
 func (p *TestPlugin) Process(event interface{}) {
-	msg, ok := event.(handler.OB11PrivateMessage)
+	msg, ok := event.(handler.Message)
 	if !ok {
 		return
 	}
