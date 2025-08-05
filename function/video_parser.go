@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type APIResponse struct {
@@ -85,10 +86,9 @@ func videoParser(message string, msgType int, id int64) {
 	} else {
 		botapi.SendVideoMsg(msgType, id, videoData.VideoURL)
 	}
-	botapi.SendVideoMsg(msgType, id, videoData.VideoURL)
 }
 
-var videoShareURLRegex = regexp.MustCompile(`(https?://)?(v\.douyin\.com|www\.iesdouyin\.com|www\.douyin\.com|v\.kuaishou\.com|share\.xiaochuankeji\.cn|v\.ixigua\.com|h5\.pipix\.com|isee\.weishi\.qq\.com|share\.huoshan\.com|www\.pearvideo\.com|h5\.pipigx\.com|xspshare\.baidu\.com|v\.huya\.com|www\.acfun\.cn|weibo\.com|weibo\.cn|meipai\.com|doupai\.cc|kg\.qq\.com|6\.cn|xinpianchang\.com|haokan\.baidu\.com|haokan\.hao123\.com|www\.xiaohongshu\.com|xhslink\.com|bilibili\.com|b23\.tv)(/[^\s]*)?`)
+var videoShareURLRegex = regexp.MustCompile(`(https?://)?(v\.douyin\.com|www\.iesdouyin\.com|www\.douyin\.com|v\.kuaishou\.com|share\.xiaochuankeji\.cn|v\.ixigua\.com|h5\.pipix\.com|isee\.weishi\.qq\.com|share\.huoshan\.com|www\.pearvideo\.com|h5\.pipigx\.com|xspshare\.baidu\.com|v\.huya\.com|www\.acfun\.cn|weibo\.com|weibo\.cn|meipai\.com|doupai\.cc|kg\.qq\.com|6\.cn|xinpianchang\.com|haokan\.baidu\.com|haokan\.hao123\.com|www\.xiaohongshu\.com|xhslink\.com|bilibili\.com|b23\.tv)(\S*)`)
 
 func regexpMatchUrlFromString(text string) (string, error) {
 	match := videoShareURLRegex.FindString(text)
@@ -97,6 +97,10 @@ func regexpMatchUrlFromString(text string) (string, error) {
 		return "", fmt.Errorf("在文本中未找到支持的视频分享链接")
 	}
 
+	if strings.Contains(match, "b23.tv") {
+		match = strings.ReplaceAll(match, `\/`, `/`)
+		match = "https://" + strings.Split(match, "?")[0]
+	}
 	return match, nil
 }
 
