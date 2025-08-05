@@ -6,3 +6,5 @@ bot:
   function:
     test: false
     video_parser: true
+video_parser:
+  video_max_size: 50
