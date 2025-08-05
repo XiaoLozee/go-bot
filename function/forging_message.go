@@ -1,15 +1,20 @@
 package function
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/XiaoLuozee/go-bot/botapi"
 	"github.com/XiaoLuozee/go-bot/handler"
 	"github.com/XiaoLuozee/go-bot/registry"
+	"html"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 type ForgingMessage struct{}
+
+var cqCodeRegex = regexp.MustCompile(`\[CQ:([^,]+)((,([^,]+)=([^,\]]+))*)]`)
 
 func (p *ForgingMessage) Process(event interface{}) {
 	msg, ok := event.(handler.OB11GroupMessage)
@@ -26,7 +31,7 @@ func (p *ForgingMessage) Process(event interface{}) {
 
 	if content == "" {
 		// 如果用户只发送了指令，没有提供内容，可以发送一条帮助信息
-		helpText := "使用方法：\n/伪造记录\nQQ号1:消息1\nQQ号2:消息2"
+		helpText := "使用方法：\n/伪造记录\nQQ号1:消息1\nQQ号2:消息2\\n\\n消息支持CQ码，例如：\\n[CQ:image,file=http://...]\\n[CQ:face,id=178]"
 		botapi.SendTextMsg(botapi.GroupMessage, msg.GroupId, helpText)
 		return
 	}
@@ -49,10 +54,65 @@ func (p *ForgingMessage) Process(event interface{}) {
 	)
 }
 
+// parseContentToSegments 将CQ码的字符串解析成消息段数组
+func parseContentToSegments(content string) []handler.OB11Segment {
+	var segments []handler.OB11Segment
+
+	matches := cqCodeRegex.FindAllStringSubmatchIndex(content, -1)
+
+	lastIndex := 0
+	for _, match := range matches {
+
+		if match[0] > lastIndex {
+			text := content[lastIndex:match[0]]
+			textData, _ := json.Marshal(botapi.TextData{Text: text})
+			segments = append(segments, handler.OB11Segment{
+				Type: "text",
+				Data: textData,
+			})
+		}
+
+		cqType := content[match[2]:match[3]]
+		paramsStr := content[match[4]:match[5]]
+
+		dataMap := make(map[string]interface{})
+		params := strings.Split(paramsStr, ",")
+		for _, param := range params {
+			if param == "" {
+				continue
+			}
+			parts := strings.SplitN(param, "=", 2)
+			if len(parts) == 2 {
+				dataMap[parts[0]] = parts[1]
+			}
+		}
+
+		jsonData, _ := json.Marshal(dataMap)
+		segments = append(segments, handler.OB11Segment{
+			Type: cqType,
+			Data: jsonData,
+		})
+
+		lastIndex = match[1]
+	}
+
+	if lastIndex < len(content) {
+		text := content[lastIndex:]
+		textData, _ := json.Marshal(botapi.TextData{Text: text})
+		segments = append(segments, handler.OB11Segment{
+			Type: "text",
+			Data: textData,
+		})
+	}
+
+	return segments
+}
+
 // parseForgedContent 解析用户输入的伪造内容
 func parseForgedContent(content string) ([]botapi.ForwardNode, error) {
-	lines := strings.Split(content, "\n")
+	decodedContent := html.UnescapeString(content)
 
+	lines := strings.Split(decodedContent, "\n")
 	var nodes []botapi.ForwardNode
 
 	for i, line := range lines {
@@ -66,7 +126,6 @@ func parseForgedContent(content string) ([]botapi.ForwardNode, error) {
 			return nil, fmt.Errorf("第 %d 行格式不正确，缺少冒号", i+1)
 		}
 
-		// 解析 QQ 号
 		qqStr := strings.TrimSpace(parts[0])
 		userID, err := strconv.ParseInt(qqStr, 10, 64)
 		if err != nil {
@@ -75,17 +134,22 @@ func parseForgedContent(content string) ([]botapi.ForwardNode, error) {
 
 		messageContent := strings.TrimSpace(parts[1])
 
+		segments := parseContentToSegments(messageContent)
+
 		info, err := botapi.GetStrangerInfo(userID)
+		nickname := fmt.Sprintf("User %d", userID) // 默认昵称
+		if err == nil && info.Nickname != "" {
+			nickname = info.Nickname
+		}
 
 		node := botapi.ForwardNode{
 			Type: "node",
 			Data: botapi.ForwardNodeData{
 				UserID:   userID,
-				Nickname: info.Nickname,
-				Content:  messageContent,
+				Nickname: nickname,
+				Content:  segments,
 			},
 		}
-
 		nodes = append(nodes, node)
 	}
 
