@@ -315,21 +315,40 @@ func SendPrivateForwardMsg(userId int64, nodes []ForwardNode) {
 
 // SendMessage 发送任意消息段组合
 func SendMessage(msgType int, id int64, messageArray []handler.OB11Segment) {
-	// 1. 构造 Action，并检查返回值是否为 nil (防止 panic)
+	// 构造 Action，并检查返回值是否为 nil (防止 panic)
 	action := buildAction(msgType, id, messageArray)
 	if action == nil {
 		log.Printf("API 调用失败: 无效的消息类型或参数, msgType: %d", msgType)
 		return
 	}
 
-	// 2. 调用底层的发送工具，并处理错误
+	// 调用底层的发送工具，并处理错误
 	if err := sendUtil(action); err != nil {
 		log.Printf("API 调用失败: %v", err)
 		return
 	}
 
-	// 3. 只有在 sendUtil 成功返回后，才打印成功日志
+	// 只有在 sendUtil 成功返回后，才打印成功日志
 	log.Printf("API 调用成功: 已发送消息到 ID %d", id)
+}
+
+func DeleteMsg(messageId int64) {
+	params := map[string]interface{}{
+		"message_id": messageId,
+	}
+
+	action := &Action{
+		Action: "delete_msg",
+		Params: params,
+		Echo:   fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+
+	log.Printf("API 调用成功: 已请求撤回消息 ID %d", messageId)
 }
 
 // 创建消息段
