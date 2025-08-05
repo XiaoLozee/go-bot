@@ -44,5 +44,11 @@ type TextData struct {
 // FileData 用于安全地序列化文件内容
 type FileData struct {
 	File    string `json:"file"`
+	Name    string `json:"name,omitempty"`
 	Summary string `json:"summary,omitempty"`
+}
+
+type AtData struct {
+	QQ   any    `json:"qq"`
+	Name string `json:"name,omitempty"`
 }

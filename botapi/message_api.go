@@ -51,6 +51,69 @@ func SendVideoMsg(msgType int, id int64, videoPath string) {
 	SendMessage(msgType, id, []handler.OB11Segment{*segment})
 }
 
+// SendFileMsg 发送文件消息
+func SendFileMsg(msgType int, id int64, filePath string, fileName string) {
+	dataPayload := FileData{File: filePath, Name: fileName}
+	segment, err := buildSegment("file", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// SendRecordMsg 发送语音消息
+func SendRecordMsg(msgType int, id int64, recordPath string) {
+	dataPayload := FileData{File: recordPath}
+	segment, err := buildSegment("record", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+	SendMessage(msgType, id, []handler.OB11Segment{*segment})
+}
+
+// SendGroupAtMsg 发送艾特
+func SendGroupAtMsg(groupId int64, userId any) {
+	dataPayload := AtData{
+		QQ: userId,
+	}
+
+	segment, err := buildSegment("at", dataPayload)
+	if err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+
+	SendMessage(GroupMessage, groupId, []handler.OB11Segment{*segment})
+}
+
+// SendGroupAtAllMsg 发送艾特全体
+func SendGroupAtAllMsg(groupId int64) {
+	SendGroupAtMsg(groupId, "all")
+}
+
+// SendGroupAtWithTextMsg 发送艾特以及消息
+func SendGroupAtWithTextMsg(groupId int64, userId any, text string) {
+	atDataPayload := AtData{QQ: userId}
+	atSegment, err1 := buildSegment("at", atDataPayload)
+	if err1 != nil {
+		log.Printf("API 调用失败: %v", err1)
+		return
+	}
+
+	textDataPayload := TextData{Text: " " + text}
+	textSegment, err2 := buildSegment("text", textDataPayload)
+	if err2 != nil {
+		log.Printf("API 调用失败: %v", err2)
+		return
+	}
+
+	messageArray := []handler.OB11Segment{*atSegment, *textSegment}
+
+	SendMessage(GroupMessage, groupId, messageArray)
+}
+
 // SendMessage 发送任意消息段组合
 func SendMessage(msgType int, id int64, messageArray []handler.OB11Segment) {
 	// 1. 构造 Action，并检查返回值是否为 nil (防止 panic)
