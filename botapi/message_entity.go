@@ -9,15 +9,15 @@ type Message struct {
 	Echo    string      `json:"echo,omitempty"` // echo 字段用于唯一标识请求
 }
 
-// GroupMsg 发送群消息结构 接口 /send_group_msg
-type GroupMsg struct {
+// GroupMsgParams 发送群消息结构 接口 /send_group_msg
+type GroupMsgParams struct {
 	GroupId int64                 `json:"group_id"`
 	Message []handler.OB11Segment `json:"message"`
 }
 
-// GroupForwardMsg 发送群合并转发消息结构 接口 /send_group_forward_msg
-type GroupForwardMsg struct {
-	GroupMsg
+// GroupForwardMsgParams 发送群合并转发消息结构 接口 /send_group_forward_msg
+type GroupForwardMsgParams struct {
+	GroupMsgParams
 	News    []string `json:"news"`
 	Prompt  string   `json:"prompt"`  // 外显
 	Summary string   `json:"summary"` // 底下文本
@@ -30,8 +30,8 @@ type GroupPoke struct {
 	UserId  int64 `json:"user_id"`
 }
 
-// PrivateMsg 发送私聊消息结构 接口 /send_private_msg
-type PrivateMsg struct {
+// PrivateMsgParams 发送私聊消息结构 接口 /send_private_msg
+type PrivateMsgParams struct {
 	UserId  int64                 `json:"user_id"`
 	Message []handler.OB11Segment `json:"message"`
 }
@@ -43,5 +43,6 @@ type TextData struct {
 
 // FileData 用于安全地序列化文件内容
 type FileData struct {
-	File string `json:"file"`
+	File    string `json:"file"`
+	Summary string `json:"summary,omitempty"`
 }
