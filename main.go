@@ -5,6 +5,7 @@ import (
 	"github.com/XiaoLuozee/go-bot/botapi"
 	_ "github.com/XiaoLuozee/go-bot/function"
 	"github.com/XiaoLuozee/go-bot/handler"
+	"github.com/XiaoLuozee/go-bot/registry"
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
@@ -30,6 +31,8 @@ func main() {
 	port := serverConfig.GetString("port")
 
 	log.Println("加载配置 -> Host: " + host + ", Port: " + port)
+
+	registry.LoadPlugins()
 
 	// 设置路由，将 "/ws" 路径的请求交给 handleWebSocket 函数处理
 	http.HandleFunc("/ws", handleWebSocket)
