@@ -99,7 +99,11 @@ func regexpMatchUrlFromString(text string) (string, error) {
 
 	if strings.Contains(match, "b23.tv") {
 		match = strings.ReplaceAll(match, `\/`, `/`)
-		match = "https://" + strings.Split(match, "?")[0]
+		match = strings.Split(match, "?")[0]
+	}
+
+	if !strings.HasPrefix(match, "http") {
+		return "https://" + match, nil
 	}
 	return match, nil
 }
