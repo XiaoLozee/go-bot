@@ -114,6 +114,48 @@ func SendGroupAtWithTextMsg(groupId int64, userId any, text string) {
 	SendMessage(GroupMessage, groupId, messageArray)
 }
 
+// SendGroupForwardMsg 发送群合并转发消息
+func SendGroupForwardMsg(groupId int64, nodes []ForwardNode, opts ...ForwardOption) {
+	params := &GroupForwardMsgParams{
+		GroupID:  groupId,
+		Messages: nodes,
+	}
+
+	for _, opt := range opts {
+		opt(params)
+	}
+
+	action := &Action{
+		Action: "send_group_forward_msg",
+		Params: params, // 将构造好的参数赋值
+		Echo:   fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+}
+
+// SendPrivateForwardMsg 发送私聊合并转发消息
+func SendPrivateForwardMsg(userId int64, nodes []ForwardNode) {
+	action := &Action{
+		Action: "send_private_forward_msg",
+		Params: &PrivateForwardMsgParams{
+			UserID:   userId,
+			Messages: nodes,
+		},
+		Echo: fmt.Sprintf("%d", time.Now().UnixNano()),
+	}
+
+	if err := sendUtil(action); err != nil {
+		log.Printf("API 调用失败: %v", err)
+		return
+	}
+
+	log.Printf("API 调用成功: 已发送合并转发消息到用户 %d", userId)
+}
+
 // SendMessage 发送任意消息段组合
 func SendMessage(msgType int, id int64, messageArray []handler.OB11Segment) {
 	// 1. 构造 Action，并检查返回值是否为 nil (防止 panic)
@@ -158,7 +200,7 @@ func sendUtil(action *Action) error {
 		return fmt.Errorf("最终 JSON 序列化错误: %w", err)
 	}
 
-	log.Println("发送内容: " + string(finalData)) // 将 "测试内容" 改为更通用的 "发送内容"
+	log.Println("发送内容: " + string(finalData))
 
 	if err := client.Send(finalData); err != nil {
 		return fmt.Errorf("发送消息到 WebSocket 失败: %w", err)

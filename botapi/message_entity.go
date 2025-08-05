@@ -15,13 +15,42 @@ type GroupMsgParams struct {
 	Message []handler.OB11Segment `json:"message"`
 }
 
-// GroupForwardMsgParams 发送群合并转发消息结构 接口 /send_group_forward_msg
+// ForwardNodeData 定义了一个转发节点的具体数据。
+type ForwardNodeData struct {
+	// 用于自定义消息节点
+	UserID   int64  `json:"user_id,omitempty"`  // 发送者 QQ 号
+	Nickname string `json:"nickname,omitempty"` // 发送者昵称
+	// 消息内容，可以是字符串（CQ码）或消息段数组
+	Content interface{} `json:"content,omitempty"`
+	// 用于转发已存在的消息节点
+	MessageID *int64 `json:"id,omitempty"` // 要转发的聊天记录的 message_id
+}
+
+// ForwardNode 代表合并转发消息中的一个节点（即一条消息）
+type ForwardNode struct {
+	Type string          `json:"type"` // 这个字段的值必须是 "node"
+	Data ForwardNodeData `json:"data"`
+}
+
+// GroupForwardMsgParams 对应 /send_group_forward_msg 接口
 type GroupForwardMsgParams struct {
-	GroupMsgParams
-	News    []string `json:"news"`
-	Prompt  string   `json:"prompt"`  // 外显
-	Summary string   `json:"summary"` // 底下文本
-	Source  string   `json:"source"`  // 内容
+	GroupID int64 `json:"group_id"`
+
+	// "messages" 由多个 ForwardNode 组成。
+	Messages []ForwardNode `json:"messages"`
+
+	// --- 以下是某些 OneBot 实现支持的可选自定义扩展字段 ---
+	Prompt  string `json:"prompt,omitempty"`  // 外显摘要，例如 "[3条聊天记录]"
+	Summary string `json:"summary,omitempty"` // 预览窗格底部的摘要
+	Source  string `json:"source,omitempty"`  // 预览窗格顶部的来源
+}
+
+// PrivateForwardMsgParams 对应 /send_private_forward_msg 接口
+type PrivateForwardMsgParams struct {
+	// 目标用户的 QQ 号。
+	UserID int64 `json:"user_id"`
+
+	Messages []ForwardNode `json:"messages"`
 }
 
 // GroupPoke 发送群聊戳一戳结构 接口 /group_poke
