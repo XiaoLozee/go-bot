@@ -7,5 +7,6 @@ bot:
     test: false
     video_parser: true
     forging_message: true
+    phantom_tank: true
 video_parser:
   video_max_size: 50

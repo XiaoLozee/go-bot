@@ -27,6 +27,13 @@ type GroupMsgParams struct {
 	Message []handler.OB11Segment `json:"message"`
 }
 
+// ImageInfo 获取图片信息的接口
+type ImageInfo struct {
+	Size     int64  `json:"size"`
+	Filename string `json:"filename"`
+	URL      string `json:"url"`
+}
+
 // ForwardNodeData 定义了一个转发节点的具体数据。
 type ForwardNodeData struct {
 	// 用于自定义消息节点

@@ -17,12 +17,13 @@ type StrangerInfo struct {
 	UserID    int64  `json:"user_id"`
 	Nickname  string `json:"nickname"`
 	Sex       string `json:"sex"`
-	Age       int32  `json:"age"` // 年龄通常不会非常大，int32 足够
+	Age       int32  `json:"age"`
 	Qid       string `json:"qid"`
-	Level     int    `json:"qq_level"` // 对应 qqLevel
+	Level     int    `json:"qq_level"`
 	LoginDays int    `json:"login_days"`
 }
 
+// GetStrangerInfo 获取账号信息
 func GetStrangerInfo(userId int64) (*StrangerInfo, error) {
 	action := &Action{
 		Action: "get_stranger_info",
@@ -43,6 +44,36 @@ func GetStrangerInfo(userId int64) (*StrangerInfo, error) {
 	var info StrangerInfo
 	if err := json.Unmarshal(resp.Data, &info); err != nil {
 		return nil, fmt.Errorf("解析 data 字段失败: %w", err)
+	}
+
+	return &info, nil
+}
+
+// GetImageInfo 获取图片信息
+func GetImageInfo(file string) (*ImageInfo, error) {
+	action := &Action{
+		Action: "get_image",
+		Params: map[string]interface{}{
+			"file": file,
+		},
+	}
+
+	resp, err := sendSync(action) // 使用我们之前创建的同步发送函数
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.RetCode != 0 {
+		return nil, fmt.Errorf("API 返回错误: %s (retcode: %d)", resp.Message, resp.RetCode)
+	}
+
+	var info ImageInfo
+	if err := json.Unmarshal(resp.Data, &info); err != nil {
+		return nil, fmt.Errorf("解析 data 字段失败: %w", err)
+	}
+
+	if info.URL == "" {
+		return nil, fmt.Errorf("API 返回的 URL 为空")
 	}
 
 	return &info, nil
