@@ -3,11 +3,17 @@ server:
   port: 8080
 bot:
   nickname: "罗纸酱"
+  master: 
   function:
     test: false
-    video_parser: true
-    forging_message: true
-    phantom_tank: true
-    jmcomic_download: true
+    video_parser: false
+    forging_message: false
+    phantom_tank: false
+    jmcomic_download: false
+    freqtrade:
+      enabled: true
+      api_url:
+      username:
+      password:
 video_parser:
   video_max_size: 50

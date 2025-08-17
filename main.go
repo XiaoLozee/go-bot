@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/XiaoLuozee/go-bot/botapi"
 	_ "github.com/XiaoLuozee/go-bot/function"
+	_ "github.com/XiaoLuozee/go-bot/function/freqtrade_bot"
 	"github.com/XiaoLuozee/go-bot/handler"
 	"github.com/XiaoLuozee/go-bot/registry"
 	"github.com/spf13/viper"
