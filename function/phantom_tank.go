@@ -159,7 +159,6 @@ func (p *PhantomTank) Process(event interface{}) {
 	} else if textMessage == "/彩色幻影坦克" || textMessage == "彩色幻影坦克" {
 		triggerMode = "color"
 	} else {
-		// 如果文本不是我们关心的触发词，就直接返回
 		return
 	}
 

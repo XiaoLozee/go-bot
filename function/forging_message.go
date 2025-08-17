@@ -30,7 +30,6 @@ func (p *ForgingMessage) Process(event interface{}) {
 	content := strings.TrimSpace(strings.TrimPrefix(msg.RawMessage, trigger))
 
 	if content == "" {
-		// 如果用户只发送了指令，没有提供内容，可以发送一条帮助信息
 		helpText := "使用方法：\n/伪造记录\nQQ号1:消息1\nQQ号2:消息2\n\n消息支持CQ码，例如：\n[CQ:image,file=http://...]\n[CQ:face,id=178]"
 		botapi.SendTextMsg(botapi.GroupMessage, msg.GroupId, helpText)
 		return

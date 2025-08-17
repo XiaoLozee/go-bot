@@ -8,5 +8,6 @@ bot:
     video_parser: true
     forging_message: true
     phantom_tank: true
+    jmcomic_download: true
 video_parser:
   video_max_size: 50
