@@ -194,7 +194,7 @@ func (p *PlumBlossom) Process(event interface{}) {
 			botapi.WithSource(fmt.Sprintf("%s 的卜卦结果", userName)),
 		)
 
-	}(msg.GroupId, msg.MessageId, hexagramInfo, msg.SelfID, "罗纸酱", msg.UserID, msg.Sender.NikeName) // 将需要的信息传入 goroutine
+	}(msg.GroupId, msg.MessageId, hexagramInfo, msg.SelfID, "罗纸酱", msg.UserID, msg.NikeName) // 将需要的信息传入 goroutine
 }
 
 // 调用ai解读卦象
