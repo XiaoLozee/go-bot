@@ -23,6 +23,50 @@ type StrangerInfo struct {
 	LoginDays int    `json:"login_days"`
 }
 
+type GroupMemberInfo struct {
+	GroupID         int64  `json:"group_id"`
+	UserID          int64  `json:"user_id"`
+	Nickname        string `json:"nickname"`
+	Card            string `json:"card"`
+	Sex             string `json:"sex"`
+	Age             int32  `json:"age"`
+	Area            string `json:"area"`
+	JoinTime        int64  `json:"join_time"`
+	LastSentTime    int64  `json:"last_sent_time"`
+	Level           string `json:"level"`
+	Role            string `json:"role"` // "owner", "admin", "member"
+	Unfriendly      bool   `json:"unfriendly"`
+	Title           string `json:"title"`
+	TitleExpireTime int64  `json:"title_expire_time"`
+	CardChangeable  bool   `json:"card_changeable"`
+}
+
+// GetGroupMemberList 获取群成员列表
+func GetGroupMemberList(groupId int64) ([]GroupMemberInfo, error) {
+	action := &Action{
+		Action: "get_group_member_list",
+		Params: map[string]interface{}{
+			"group_id": groupId,
+		},
+	}
+
+	resp, err := sendSync(action)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.RetCode != 0 {
+		return nil, fmt.Errorf("API 返回错误: %s (retcode: %d)", resp.Message, resp.RetCode)
+	}
+
+	var memberList []GroupMemberInfo
+	if err := json.Unmarshal(resp.Data, &memberList); err != nil {
+		return nil, fmt.Errorf("解析群成员列表 data 失败: %w", err)
+	}
+
+	return memberList, nil
+}
+
 // GetStrangerInfo 获取账号信息
 func GetStrangerInfo(userId int64) (*StrangerInfo, error) {
 	action := &Action{

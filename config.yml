@@ -3,17 +3,21 @@ server:
   port: 8080
 bot:
   nickname: "罗纸酱"
-  master: 
+  master: 2686020087
   function:
     test: false
     video_parser: false
-    forging_message: false
+    forging_message: true
     phantom_tank: false
     jmcomic_download: false
+    menu_hint: true
+    plum_blossom:
+      api_key: sk-4c78380033bf4bb59029a6624a199d5a
+      enabled: true
     freqtrade:
       enabled: true
-      api_url:
-      username:
-      password:
+      api_url: http://166.108.232.2:8080
+      username: xiaoluozhi
+      password: XLZnb123@
 video_parser:
   video_max_size: 50
