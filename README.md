@@ -475,4 +475,4 @@ npm run build
 
 ## License
 
-当前仓库尚未声明开源许可证。正式发布前建议补充 `LICENSE` 文件。
+本项目采用 GPL-3.0 协议发布，详见 `LICENSE`。
