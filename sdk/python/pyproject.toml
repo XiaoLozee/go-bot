@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gobot-plugin-sdk"
+version = "0.1.0"
+description = "Typed Python SDK for Go-bot external_exec plugins"
+requires-python = ">=3.9"
+authors = [{ name = "Go-bot" }]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gobot_plugin*"]
+
+[tool.setuptools.package-data]
+gobot_plugin = ["py.typed"]

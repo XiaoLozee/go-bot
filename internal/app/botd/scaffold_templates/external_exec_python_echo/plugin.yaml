@@ -1,0 +1,9 @@
+id: {{.PluginID}}
+name: {{.PluginName}}
+version: 0.1.0
+description: {{.Description}}
+author: Go-bot
+runtime: python
+entry: ./main.py
+protocol: stdio_jsonrpc
+config_schema: ./config.schema.json

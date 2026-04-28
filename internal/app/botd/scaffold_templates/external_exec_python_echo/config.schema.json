@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "keyword": {
+      "type": "string",
+      "title": "触发指令",
+      "default": "/{{.PluginID}}"
+    },
+    "response": {
+      "type": "string",
+      "title": "回复内容",
+      "default": "{{.PluginName}} is alive"
+    }
+  }
+}

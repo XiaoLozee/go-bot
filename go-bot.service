@@ -1,18 +1,15 @@
 [Unit]
-Description=Go机器人
-After=network.target
+Description=Go-bot service
+After=network-online.target
+Wants=network-online.target
+
 [Service]
 Type=simple
-
-User=root
-Group=root
-
-WorkingDirectory=/www/go-bot
-
-ExecStart=/www/go-bot/server
-
+User=gobot
+Group=gobot
+WorkingDirectory=/opt/go-bot
+ExecStart=/opt/go-bot/go-bot --config /opt/go-bot/configs/config.yml
 Restart=on-failure
-
 RestartSec=5s
 
 [Install]

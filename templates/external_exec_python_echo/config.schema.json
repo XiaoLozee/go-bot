@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "keyword": {
+      "type": "string",
+      "title": "触发指令",
+      "default": "/echo-demo"
+    },
+    "response": {
+      "type": "string",
+      "title": "回复内容",
+      "default": "external_exec python template is alive"
+    }
+  }
+}

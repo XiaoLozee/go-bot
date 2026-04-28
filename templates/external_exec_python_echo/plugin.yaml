@@ -1,0 +1,9 @@
+id: template_python_echo
+name: Python Echo Template
+version: 0.1.0
+description: 一个最小的 external_exec Python 示例插件
+author: Go-bot
+runtime: python
+entry: ./main.py
+protocol: stdio_jsonrpc
+config_schema: ./config.schema.json

@@ -1,0 +1,30 @@
+app:
+  # 可选：机器人主人 QQ，仅用于主人权限判定与插件接口读取
+  owner_qq: ""
+
+connections:
+  - id: napcat-main
+    enabled: true
+    ingress:
+      # 可选值: ws_server / ws_reverse / http_callback
+      type: ws_server
+      listen: ":8080"
+    action:
+      # ws_server 默认推断为 onebot_ws，如使用 NapCat HTTP 动作接口请显式填写
+      type: napcat_http
+      base_url: http://127.0.0.1:3000
+
+security:
+  admin_auth:
+    enabled: false
+    password: ""
+
+# 其余配置均有系统默认值：
+# - 管理后台默认监听 :8090，WebUI 默认开启
+# - 存储默认使用 sqlite，路径 ./data/app.db
+# - 媒体默认使用本地存储 ./data/media
+# - AI 默认关闭；如需启用，请在 WebUI 中补充 provider.base_url / api_key / model
+# - 插件默认按需启用；未配置插件不会写入配置文件
+#
+# 如需查看所有展开配置项，请参考：
+#   configs/config.full.example.yml
